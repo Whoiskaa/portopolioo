@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Beautiful Flower ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-pink: #ff4d6d;
+            --secondary-pink: #ffb3c1;
+            --bg-dark: #1a1a1a;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg-dark);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Container Utama */
+        .container {
+            position: relative;
+            text-align: center;
+            z-index: 5;
+        }
+
+        /* Efek Glow di Belakang Foto */
+        .photo-wrapper {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 30px;
+        }
+
+        .photo-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -10px; left: -10px; right: -10px; bottom: -10px;
+            background: linear-gradient(45deg, var(--primary-pink), #7000ff, var(--primary-pink));
+            border-radius: 50%;
+            z-index: -1;
+            animation: rotateGlow 3s linear infinite;
+            filter: blur(15px);
+        }
+
+        .photo-wrapper img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+        }
+
+        @keyframes rotateGlow {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Lirik Lagu Animasi */
+        .lyrics-container {
+            height: 120px;
+        }
+
+        .lyric-line {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            color: var(--secondary-pink);
+            text-shadow: 0 0 10px rgba(255, 77, 109, 0.5);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+            position: absolute;
+            width: 100%;
+            left: 0;
+        }
+
+        .lyric-line.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Tombol Interaktif */
+        .love-button {
+            background: transparent;
+            border: 2px solid var(--primary-pink);
+            color: var(--primary-pink);
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.4s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+
+        .love-button:hover {
+            background: var(--primary-pink);
+            color: white;
+            box-shadow: 0 0 30px var(--primary-pink);
+        }
+
+        /* Canvas untuk Particle Bunga */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .heart-icon {
+            color: var(--primary-pink);
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="flowerCanvas"></canvas>
+
+    <div class="container">
+        <div class="photo-wrapper">
+            <img src="img/image.png" alt="My Beautiful Girl">
+        </div>
+
+        <div class="lyrics-container" id="lyricsBox">
+            </div>
+
+        <button class="love-button" onclick="celebrate()">For My Flower <span class="heart-icon">❤️</span></button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('flowerCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Data Lirik
+       const lines = [
+    "I know a place...",
+    "It's somewhere I go...",
+    "When I need to remember your face.",
+    "We get married in our heads...",
+    "There was something about you...",
+    "That I didn't know.",
+    "Do you think I have forgotten...",
+    "About you? ❤️"
+];
+
+        let currentLine = 0;
+        const lyricsBox = document.getElementById('lyricsBox');
+
+        // Render Lirik
+        lines.forEach((text, i) => {
+            const div = document.createElement('div');
+            div.className = 'lyric-line';
+            div.innerText = text;
+            lyricsBox.appendChild(div);
+        });
+
+        function cycleLyrics() {
+            const lyricElements = document.querySelectorAll('.lyric-line');
+            lyricElements.forEach(el => el.classList.remove('active'));
+            lyricElements[currentLine].classList.add('active');
+            currentLine = (currentLine + 1) % lines.length;
+        }
+
+        setInterval(cycleLyrics, 3500);
+        cycleLyrics();
+
+        // Particle System (Bunga & Love)
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 5 + 2;
+                this.speedX = Math.random() * 3 - 1.5;
+                this.speedY = Math.random() * 1 + 0.5;
+                this.color = `hsl(${Math.random() * 30 + 340}, 100%, 70%)`;
+            }
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                if (this.y > canvas.height) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                // Gambar bentuk love kecil
+                ctx.moveTo(this.x, this.y);
+                ctx.bezierCurveTo(this.x - 5, this.y - 5, this.x - 10, this.y + 5, this.x, this.y + 10);
+                ctx.bezierCurveTo(this.x + 10, this.y + 5, this.x + 5, this.y - 5, this.x, this.y);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            for (let i = 0; i < 70; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+
+        function celebrate() {
+            for(let i=0; i<30; i++) {
+                particles.push(new Particle());
+            }
+            const btn = document.querySelector('.love-button');
+            btn.innerText = "YOU ARE LOVED! ✨";
+            setTimeout(() => btn.innerText = "For My Flower ❤️", 2000);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
